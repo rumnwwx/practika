@@ -1,10 +1,18 @@
 from django.shortcuts import render
-from .models import Book, Author, BookInstance, Genre
+from .models import Book, Author, BookInstance, Genre, Language
 from django.views import generic
 from django.http import Http404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
-
+from django.contrib.auth.decorators import permission_required
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+import datetime
+from .forms import RenewBookForm
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+from .models import Author
 
 
 class LoanedBooksByUserListView(LoginRequiredMixin,generic.ListView):
@@ -17,6 +25,7 @@ class LoanedBooksByUserListView(LoginRequiredMixin,generic.ListView):
 
     def get_queryset(self):
         return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact='o').order_by('due_back')
+
 
 def index(request):
     """
@@ -76,13 +85,6 @@ class AuthorDetailView(generic.DetailView):
     model = Author
 
 
-from django.contrib.auth.decorators import permission_required
-from django.shortcuts import get_object_or_404
-from django.http import HttpResponseRedirect
-from django.urls import reverse
-import datetime
-from .forms import RenewBookForm
-
 @permission_required('catalog.can_mark_returned')
 def renew_book_librarian(request, pk):
     """
@@ -113,27 +115,17 @@ def renew_book_librarian(request, pk):
     return render(request, 'catalog/book_renew_librarian.html', {'form': form, 'bookinst':book_inst})
 
 
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.urls import reverse_lazy
-from .models import Author
-
 class AuthorCreate(CreateView):
     model = Author
     fields = '__all__'
     initial={'date_of_death':'12/10/2016',}
 
-class AuthorUpdate(UpdateView):
-    model = Author
-    fields = ['first_name','last_name','date_of_birth','date_of_death']
-
-class AuthorDelete(DeleteView):
-    model = Author
-    success_url = reverse_lazy('authors')
 
 class AuthorUpdate(PermissionRequiredMixin, UpdateView):
     model = Author
     fields = '__all__'
     permission_required = 'catalog.change_author'
+
 
 class AuthorDelete(PermissionRequiredMixin, DeleteView):
     model = Author
@@ -152,7 +144,6 @@ class LoanedBooksAllListView(PermissionRequiredMixin, generic.ListView):
         return BookInstance.objects.filter(status__exact='o').order_by('due_back')
 
 
-
 class BookCreate(PermissionRequiredMixin, CreateView):
     model = Book
     fields = ['title', 'author', 'summary', 'isbn', 'genre']
@@ -169,3 +160,29 @@ class BookDelete(PermissionRequiredMixin, DeleteView):
     model = Book
     success_url = reverse_lazy('books')
     permission_required = 'catalog.delete_book'
+
+
+class LanguageListView(generic.ListView):
+    model = Language
+
+
+class LanguageDetailView(generic.DetailView):
+    model = Language
+
+
+class LanguageCreate(PermissionRequiredMixin, CreateView):
+    model = Language
+    fields = ['name']
+    permission_required = 'catalog.add_language'
+
+
+class LanguageUpdate(PermissionRequiredMixin, UpdateView):
+    model = Language
+    fields = ['name']
+    permission_required = 'catalog.change_language'
+
+
+class LanguageDelete(PermissionRequiredMixin, DeleteView):
+    model = Language
+    success_url = reverse_lazy('languages')
+    permission_required = 'catalog.delete_language'

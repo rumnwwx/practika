@@ -3,6 +3,8 @@ from django.urls import reverse
 import uuid
 from django.contrib.auth.models import User
 from datetime import date
+from django.db.models import UniqueConstraint
+from django.db.models.functions import Lower
 
 class Genre(models.Model):
     """
@@ -121,3 +123,25 @@ class Author(models.Model):
         return '%s, %s' % (self.last_name, self.first_name)
 
 
+class Language(models.Model):
+    """Model representing a Language (e.g. English, French, Japanese, etc.)"""
+    name = models.CharField(max_length=200,
+                            unique=True,
+                            help_text="Enter the book's natural language (e.g. English, French, Japanese etc.)")
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular language instance."""
+        return reverse('language-detail', args=[str(self.id)])
+
+    def __str__(self):
+        """String for representing the Model object (in Admin site etc.)"""
+        return self.name
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(
+                Lower('name'),
+                name='language_name_case_insensitive_unique',
+                violation_error_message = "Language already exists (case insensitive match)"
+            ),
+        ]
