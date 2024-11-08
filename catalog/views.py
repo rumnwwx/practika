@@ -3,6 +3,7 @@ from .models import Book, Author, BookInstance, Genre
 from django.views import generic
 from django.http import Http404
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 
 
@@ -129,8 +130,16 @@ class AuthorDelete(DeleteView):
     model = Author
     success_url = reverse_lazy('authors')
 
+class AuthorUpdate(PermissionRequiredMixin, UpdateView):
+    model = Author
+    fields = '__all__'
+    permission_required = 'catalog.change_author'
 
-from django.contrib.auth.mixins import PermissionRequiredMixin
+class AuthorDelete(PermissionRequiredMixin, DeleteView):
+    model = Author
+    success_url = reverse_lazy('authors')
+    permission_required = 'catalog.delete_author'
+
 
 class LoanedBooksAllListView(PermissionRequiredMixin, generic.ListView):
     """Generic class-based view listing all books on loan. Only visible to users with can_mark_returned permission."""
@@ -148,3 +157,15 @@ class BookCreate(PermissionRequiredMixin, CreateView):
     model = Book
     fields = ['title', 'author', 'summary', 'isbn', 'genre']
     permission_required = 'catalog.add_book'
+
+
+class BookUpdate(PermissionRequiredMixin, UpdateView):
+    model = Book
+    fields = ['title', 'author', 'summary', 'isbn', 'genre']
+    permission_required = 'catalog.change_book'
+
+
+class BookDelete(PermissionRequiredMixin, DeleteView):
+    model = Book
+    success_url = reverse_lazy('books')
+    permission_required = 'catalog.delete_book'

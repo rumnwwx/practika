@@ -1,8 +1,6 @@
 from django.urls import include
 from django.urls import path
 from . import views
-
-
 urlpatterns = [
     path('', views.index, name='index'),
     path('books/', views.BookListView.as_view(), name='books'),
@@ -15,6 +13,10 @@ urlpatterns = [
     path('author/<int:pk>/update/', views.AuthorUpdate.as_view(), name='author-update'),
     path('author/<int:pk>/delete/', views.AuthorDelete.as_view(), name='author-delete'),
     path('borrowed/', views.LoanedBooksAllListView.as_view(), name='all-borrowed'),
-    path('book/create/', views.BookCreate.as_view(), name='book-create')
+    path('book/create/', views.BookCreate.as_view(), name='book-create'),
+    path('book/<int:pk>/delete/', views.BookDelete.as_view(), name='book-delete'),
+    path('book/<int:pk>/update/', views.BookUpdate.as_view(), name='book-update'),
 ]
+
+
 
