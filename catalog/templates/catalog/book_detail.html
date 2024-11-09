@@ -8,6 +8,13 @@
   <p><strong>ISBN:</strong> {{ book.isbn }}</p>
   <p><strong>Язык:</strong> {{ book.language }}</p>
   <p><strong>Жанр:</strong> {% for genre in book.genre.all %} {{ genre }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+  <p><strong>Издатель:</strong> {% if book.publishers.count > 0 %}
+        {% for publisher in book.publishers.all %}
+            <p>{{ publisher.name }}</p>
+        {% endfor %}
+    {% else %}
+        <li>У этой книги нет издателей.</li>
+    {% endif %}</p>
 
   <div style="margin-left:20px;margin-top:20px">
     <h4>Копии</h4>

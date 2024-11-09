@@ -19,6 +19,27 @@ class Genre(models.Model):
         return self.name
 
 
+class Publisher(models.Model):
+
+    name = models.CharField(
+        max_length=200,
+        unique=True,
+        help_text="Введите название издания (например, Penguin Classics, Альфа-книга)"
+    )
+    publication_city = models.CharField(
+        max_length=100,
+        help_text="Введите город выпуска издания (например, Москва, Нью-Йорк)"
+    )
+
+
+    def get_absolute_url(self):
+        """Возвращает URL для доступа к конкретному экземпляру издания."""
+        return reverse('publisher-detail', args=[str(self.id)])
+
+    def __str__(self):
+        return self.name
+
+
 class Book(models.Model):
     """
     модель книги
@@ -33,6 +54,8 @@ class Book(models.Model):
     summary = models.TextField(max_length=1000, help_text="Enter a brief description of the book")
     isbn = models.CharField('ISBN',max_length=13, help_text='13 Character <a href="https://www.isbn-international.org/content/what-isbn">ISBN number</a>')
     genre = models.ManyToManyField(Genre, help_text="Select a genre for this book")
+    publishers = models.ManyToManyField(Publisher, related_name='books')
+
 
     """
     # ManyToManyField(многие ко многим) используется потому, что жанр может содержать много книг. Книги могут охватывать много жанров.
@@ -137,11 +160,4 @@ class Language(models.Model):
         """String for representing the Model object (in Admin site etc.)"""
         return self.name
 
-    class Meta:
-        constraints = [
-            UniqueConstraint(
-                Lower('name'),
-                name='language_name_case_insensitive_unique',
-                violation_error_message = "Language already exists (case insensitive match)"
-            ),
-        ]
+

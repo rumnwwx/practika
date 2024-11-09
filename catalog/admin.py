@@ -1,11 +1,9 @@
 from django.contrib import admin
-from .models import Author, Genre, Book, BookInstance, Language
-
+from .models import Author, Genre, Book, BookInstance, Language, Publisher
 
 #admin.site.register(Book)
 #admin.site.register(BookInstance)
 #admin.site.register(Author)
-
 admin.site.register(Genre)
 
 
@@ -47,3 +45,12 @@ class AuthorAdmin(admin.ModelAdmin):
 @admin.register(Language)
 class LanguagesAdmin(admin.ModelAdmin):
     model = Language
+
+
+@admin.register(Publisher)
+class PublisherAdmin(admin.ModelAdmin):
+    list_display = ('name', 'get_books')
+
+    def get_books(self, obj):
+        return ", ".join([book.title for book in obj.books.all()])
+    get_books.short_description = 'Книги'

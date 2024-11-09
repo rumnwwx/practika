@@ -1,0 +1,21 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+<h1>Издатель: {{ publisher.name }} </h1>
+
+<div style="margin-left:20px;margin-top:20px">
+<h4>Книги</h4>
+
+<dl>
+{% if publisher.book_set.count > 0 %}
+    {% for book in publisher.book_set.all %}
+        <dd>Название книги: <a href="{% url 'book-detail' book.pk %}">{{ book.title }}</a></dd>
+    {% endfor %}
+{% else %}
+    <dd>У этого издателя нет книг(</dd>
+{% endif %}
+</dl>
+</div>
+</div>
+{% endblock %}

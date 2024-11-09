@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Book, Author, BookInstance, Genre, Language
+from .models import Book, Author, BookInstance, Genre, Language, Publisher
 from django.views import generic
 from django.http import Http404
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -71,6 +71,10 @@ class BookDetailView(generic.DetailView):
             'catalog/book_detail.html',
             context={'book': book_id, }
         )
+
+    def book_detail(request, book_id):
+        book = get_object_or_404(Book, id=book_id)
+        return render(request, 'book_detail.html', {'book': book})
 
 
 class BookListView(generic.ListView):
@@ -146,13 +150,13 @@ class LoanedBooksAllListView(PermissionRequiredMixin, generic.ListView):
 
 class BookCreate(PermissionRequiredMixin, CreateView):
     model = Book
-    fields = ['title', 'author', 'summary', 'isbn', 'genre']
+    fields = ['title', 'author', 'summary', 'isbn', 'genre', 'publisher']
     permission_required = 'catalog.add_book'
 
 
 class BookUpdate(PermissionRequiredMixin, UpdateView):
     model = Book
-    fields = ['title', 'author', 'summary', 'isbn', 'genre']
+    fields = ['title', 'author', 'summary', 'isbn', 'genre', 'publisher']
     permission_required = 'catalog.change_book'
 
 
@@ -186,3 +190,15 @@ class LanguageDelete(PermissionRequiredMixin, DeleteView):
     model = Language
     success_url = reverse_lazy('languages')
     permission_required = 'catalog.delete_language'
+
+
+class PublisherListView(generic.ListView):
+    model = Publisher
+
+
+class PublisherDetailView(generic.DetailView):
+    model = Publisher
+
+    def publisher_detail(request, publisher_id):
+        publisher = get_object_or_404(Publisher, id=publisher_id)
+        return render(request, 'your_template.html', {'publisher': publisher})
